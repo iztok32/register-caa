@@ -7,6 +7,16 @@ export interface User {
     email_verified_at?: string;
 }
 
+export interface NavigationItem {
+    id: number;
+    type: string;
+    title_key: string;
+    url?: string;
+    icon?: string;
+    metadata?: any;
+    children?: NavigationItem[];
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
@@ -16,6 +26,11 @@ export type PageProps<
     locale: string;
     availableLocales: string[];
     translations: Record<string, string>;
+    navigation: {
+        main: NavigationItem[];
+        teams: NavigationItem[];
+        projects: NavigationItem[];
+    };
 };
 
 declare global {

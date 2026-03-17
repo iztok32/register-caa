@@ -1,17 +1,5 @@
 import * as React from "react"
-import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react"
-
+import * as Icons from "lucide-react"
 import { NavMain } from "@/Components/nav-main"
 import { NavProjects } from "@/Components/nav-projects"
 import { NavUser } from "@/Components/nav-user"
@@ -23,149 +11,67 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/Components/ui/sidebar"
+import { NavigationItem, User } from "@/types"
+import { useTranslation } from "@/lib/i18n"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+const IconMapper = (iconName?: string) => {
+  if (!iconName) return Icons.HelpCircle;
+  const IconComponent = (Icons as any)[iconName];
+  return IconComponent || Icons.HelpCircle;
 }
 
-export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & { user: any }) {
+export function AppSidebar({ 
+    user, 
+    navigation, 
+    ...props 
+}: React.ComponentProps<typeof Sidebar> & { 
+    user: User, 
+    navigation: { 
+        main: NavigationItem[], 
+        teams: NavigationItem[], 
+        projects: NavigationItem[] 
+    } 
+}) {
+  const { t } = useTranslation();
+
+  const teams = navigation.teams.map(team => ({
+    name: t(team.title_key),
+    logo: IconMapper(team.icon),
+    plan: team.metadata?.plan || '',
+  }));
+
+  const navMain = navigation.main.map(item => ({
+    title: t(item.title_key),
+    url: item.url || '#',
+    icon: IconMapper(item.icon),
+    isActive: false, 
+    items: item.children?.map(sub => ({
+      title: t(sub.title_key),
+      url: sub.url || '#',
+    })) || [],
+  }));
+
+  const projects = navigation.projects.map(project => ({
+    name: t(project.title_key),
+    url: project.url || '#',
+    icon: IconMapper(project.icon),
+  }));
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navMain} label={t("Platform")} />
+        <NavProjects projects={projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavUser user={{
+          name: user.name,
+          email: user.email,
+          avatar: undefined 
+        }} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -17,6 +17,8 @@ import {
   useSidebar,
 } from "@/Components/ui/sidebar"
 
+import { useTranslation } from "@/lib/i18n"
+
 export function TeamSwitcher({
   teams,
 }: {
@@ -27,6 +29,7 @@ export function TeamSwitcher({
   }[]
 }) {
   const { isMobile } = useSidebar()
+  const { t } = useTranslation();
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
 
   if (!activeTeam) {
@@ -61,7 +64,7 @@ export function TeamSwitcher({
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
+              {t('Teams')}
             </DropdownMenuLabel>
             {teams.map((team, index) => (
               <DropdownMenuItem
@@ -81,7 +84,7 @@ export function TeamSwitcher({
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
+              <div className="font-medium text-muted-foreground">{t('Add team')}</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

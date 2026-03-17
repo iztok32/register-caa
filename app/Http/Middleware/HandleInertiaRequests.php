@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\NavigationItem;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,6 +37,13 @@ class HandleInertiaRequests extends Middleware
             ],
             'locale' => app()->getLocale(),
             'availableLocales' => config('app.available_locales'),
+            'navigation' => [
+                'main' => NavigationItem::where('type', 'main')->whereNull('parent_id')->where('is_active', true)->with(['children' => function($query) {
+                    $query->where('is_active', true)->orderBy('sort_order');
+                }])->orderBy('sort_order')->get(),
+                'teams' => NavigationItem::where('type', 'team')->where('is_active', true)->orderBy('sort_order')->get(),
+                'projects' => NavigationItem::where('type', 'project')->where('is_active', true)->orderBy('sort_order')->get(),
+            ],
             'translations' => array_merge(
                 is_file(base_path("lang/".app()->getLocale().".json")) 
                     ? json_decode(file_get_contents(base_path("lang/".app()->getLocale().".json")), true) 
