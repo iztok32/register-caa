@@ -90,5 +90,9 @@
     "Active": "Active",
     "Inactive": "Inactive",
     "Update Item": "Update Item",
-    "Create Item": "Create Item"
+    "Create Item": "Create Item",
+    "Confirm Delete": "Confirm Delete",
+    "Are you sure you want to delete this navigation item? This action cannot be undone.": "Are you sure you want to delete this navigation item? This action cannot be undone.",
+    "Delete": "Delete",
+    "Show Active Only": "Show Active Only"
 }

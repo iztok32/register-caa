@@ -40,7 +40,7 @@ class NavigationItemController extends Controller
         return redirect()->back()->with('success', 'Item created successfully');
     }
 
-    public function update(Request $request, NavigationItem $navigationItem)
+    public function update(Request $request, NavigationItem $navigation)
     {
         $validated = $request->validate([
             'parent_id' => 'nullable|exists:navigation_items,id',
@@ -54,14 +54,14 @@ class NavigationItemController extends Controller
             'metadata' => 'nullable|array',
         ]);
 
-        $navigationItem->update($validated);
+        $navigation->update($validated);
 
         return redirect()->back()->with('success', 'Item updated successfully');
     }
 
-    public function destroy(NavigationItem $navigationItem)
+    public function destroy(NavigationItem $navigation)
     {
-        $navigationItem->delete();
+        $navigation->delete();
 
         return redirect()->back()->with('success', 'Item deleted successfully');
     }
