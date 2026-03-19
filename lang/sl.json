@@ -94,5 +94,8 @@
     "Confirm Delete": "Potrdi brisanje",
     "Are you sure you want to delete this navigation item? This action cannot be undone.": "Ali ste prepričani, da želite izbrisati ta element navigacije? Tega dejanja ni mogoče razveljaviti.",
     "Delete": "Izbriši",
-    "Show Active Only": "Prikaži samo aktivne"
+    "Show Active Only": "Prikaži samo aktivne",
+    "Metadata Settings": "Nastavitve metapodatkov",
+    "Plan (Team)": "Plan (Ekipa)",
+    "Custom Metadata (JSON)": "Poljubni metapodatki (JSON)"
 }

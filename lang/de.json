@@ -93,5 +93,8 @@
     "Confirm Delete": "Löschen bestätigen",
     "Are you sure you want to delete this navigation item? This action cannot be undone.": "Sind Sie sicher, dass Sie dieses Navigationselement löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
     "Delete": "Löschen",
-    "Show Active Only": "Nur Aktive anzeigen"
+    "Show Active Only": "Nur Aktive anzeigen",
+    "Metadata Settings": "Metadaten-Einstellungen",
+    "Plan (Team)": "Plan (Team)",
+    "Custom Metadata (JSON)": "Benutzerdefinierte Metadaten (JSON)"
 }
