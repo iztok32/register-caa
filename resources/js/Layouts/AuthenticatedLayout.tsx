@@ -1,6 +1,7 @@
 import { AppSidebar } from '@/Components/app-sidebar';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import ThemeToggle from '@/Components/ThemeToggle';
+import FlashMessages from '@/Components/FlashMessages';
 import { useTranslation } from '@/lib/i18n';
 import {
     Breadcrumb,
@@ -50,6 +51,7 @@ export default function AuthenticatedLayout({
                     </div>
                 </header>
                 <main className="flex flex-1 flex-col gap-4 p-4">
+                    <FlashMessages />
                     {children}
                 </main>
             </SidebarInset>
