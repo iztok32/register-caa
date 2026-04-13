@@ -107,7 +107,7 @@ export default function ResetPassword({ token, email }: { token: string, email: 
 
                         <div className="relative hidden bg-muted md:block bg-black">
                             <img
-                                src="/images/reset-password-bg.png"
+                                src="/images/reset-password-bg.jpg"
                                 alt="Reset password background"
                                 className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             />

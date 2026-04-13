@@ -66,7 +66,7 @@ export default function ConfirmPassword() {
 
                         <div className="relative hidden bg-muted md:block bg-black">
                             <img
-                                src="/images/ConfirmPassword.png"
+                                src="/images/confirm-password-bg.jpg"
                                 alt="Confirm Password background"
                                 className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             />

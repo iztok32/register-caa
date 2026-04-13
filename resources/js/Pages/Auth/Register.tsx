@@ -130,7 +130,7 @@ export default function Register() {
                         </form>
                         <div className="relative hidden bg-muted md:block bg-black">
                             <img
-                                src="/images/signup-bg.png"
+                                src="/images/signup-bg.jpg"
                                 alt="Signup background"
                                 className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             />

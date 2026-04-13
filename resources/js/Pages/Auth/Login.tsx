@@ -124,7 +124,7 @@ export default function Login({ status, canResetPassword }: { status?: string, c
               </form>
               <div className="relative hidden bg-muted md:block bg-black">
                 <img
-                  src="/images/login-bg.png"
+                  src="/images/login-bg.jpg"
                   alt="Login background"
                   className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                 />

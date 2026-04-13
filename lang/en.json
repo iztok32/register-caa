@@ -424,5 +424,17 @@
     "Select date": "Select date",
     "All statuses": "All statuses",
     "Table view": "Table view",
-    "Card view": "Card view"
+    "Card view": "Card view",
+    "Zrakoplovi": "Aircraft",
+    "Registracija in evidenca zrakoplovov civilnega letalstva": "Registration and records of civil aviation aircraft",
+    "Letalsko osebje": "Aviation Personnel",
+    "Licence pilotov, kontrolorjev in letalskega tehničnega osebja": "Licences for pilots, controllers and aviation maintenance personnel",
+    "Brezpilotni sistemi": "Unmanned Systems",
+    "Registracija upravljavcev in brezpilotnih zrakoplovov (UAS)": "Registration of operators and unmanned aircraft (UAS)",
+    "Letalske organizacije": "Aviation Organisations",
+    "Odobritve in certifikati letalskih šol ter organizacij": "Approvals and certificates for aviation training organisations",
+    "Varnostni programi": "Security Programmes",
+    "Varnostni programi letališč in ponudnikov storitev": "Security programmes for aerodromes and service providers",
+    "Letališka infrastruktura": "Aerodrome Infrastructure",
+    "Evidenca letališč, vzletišč in helipadov": "Registry of aerodromes, airstrips and helipads"
 }

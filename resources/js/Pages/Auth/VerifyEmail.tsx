@@ -64,7 +64,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
                         <div className="relative hidden bg-muted md:block bg-black">
                             <img
-                                src="/images/VerifyEmail.png"
+                                src="/images/verify-email-bg.jpg"
                                 alt="Verify Email background"
                                 className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             />

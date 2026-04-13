@@ -79,7 +79,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         
                         <div className="relative hidden bg-muted md:block bg-black">
                             <img
-                                src="/images/forgot-password-bg.png"
+                                src="/images/forgot-password-bg.jpg"
                                 alt="Forgot password background"
                                 className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
                             />
