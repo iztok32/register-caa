@@ -29,6 +29,7 @@ class User extends Authenticatable implements AuditableContract
         'gsm_number',
         'avatar',
         'config',
+        'two_factor_required',
     ];
 
     /**
@@ -39,6 +40,8 @@ class User extends Authenticatable implements AuditableContract
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -50,10 +53,42 @@ class User extends Authenticatable implements AuditableContract
     {
         return [
             'email_verified_at' => 'datetime',
+            'two_factor_confirmed_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'two_factor_required' => 'boolean',
             'config' => 'array',
         ];
+    }
+
+    /**
+     * Check if two-factor authentication is enabled and confirmed.
+     */
+    public function hasEnabledTwoFactor(): bool
+    {
+        return $this->two_factor_confirmed_at !== null;
+    }
+
+    /**
+     * Get the decrypted two-factor authentication secret key.
+     */
+    public function twoFactorSecretKey(): ?string
+    {
+        return $this->two_factor_secret
+            ? decrypt($this->two_factor_secret)
+            : null;
+    }
+
+    /**
+     * Get the decrypted two-factor authentication recovery codes.
+     */
+    public function twoFactorRecoveryCodes(): array
+    {
+        if (!$this->two_factor_recovery_codes) {
+            return [];
+        }
+
+        return json_decode(decrypt($this->two_factor_recovery_codes), true) ?? [];
     }
 
     public function roles()

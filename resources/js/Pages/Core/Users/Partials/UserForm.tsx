@@ -19,6 +19,8 @@ interface User {
     email: string;
     gsm_number?: string;
     is_active: boolean;
+    two_factor_required: boolean;
+    two_factor_enabled?: boolean;
     roles: string[];
 }
 
@@ -41,6 +43,7 @@ export default function UserForm({ user, roles, onClose }: Props) {
         email: user?.email || '',
         gsm_number: user?.gsm_number || '',
         is_active: user?.is_active ?? true,
+        two_factor_required: user?.two_factor_required ?? false,
         role_id: null as number | null,
     });
 
@@ -149,6 +152,25 @@ export default function UserForm({ user, roles, onClose }: Props) {
                 <Label htmlFor="is_active" className="cursor-pointer">
                     {t('Active')}
                 </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <Checkbox
+                    id="two_factor_required"
+                    checked={data.two_factor_required}
+                    onCheckedChange={(checked) => setData('two_factor_required', !!checked)}
+                />
+                <div>
+                    <Label htmlFor="two_factor_required" className="cursor-pointer">
+                        {t('Require Two-Factor Authentication')}
+                    </Label>
+                    {user?.two_factor_enabled && (
+                        <p className="text-xs text-muted-foreground">{t('2FA is currently active on this account.')}</p>
+                    )}
+                    {user && !user.two_factor_enabled && data.two_factor_required && (
+                        <p className="text-xs text-amber-600">{t('User will be prompted to set up 2FA on next login.')}</p>
+                    )}
+                </div>
             </div>
 
             <div className="flex justify-end gap-3">

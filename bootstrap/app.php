@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register middleware aliases
         $middleware->alias([
             'permission' => \App\Http\Middleware\CheckPermission::class,
+            'two-factor' => \App\Http\Middleware\EnsureTwoFactorAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

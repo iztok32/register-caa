@@ -4,10 +4,11 @@ import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import UpdateProfileAvatar from './Partials/UpdateProfileAvatar';
+import TwoFactorAuthenticationForm from './Partials/TwoFactorAuthenticationForm';
 import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent } from '@/Components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
-import { User, Lock, AlertTriangle } from 'lucide-react';
+import { User, Lock, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface Permissions {
@@ -16,13 +17,20 @@ interface Permissions {
     canDelete: boolean;
 }
 
+interface TwoFactorData {
+    enabled: boolean;
+    required: boolean;
+    hasSecret: boolean;
+}
+
 interface Props {
     mustVerifyEmail: boolean;
     status?: string;
     permissions: Permissions;
+    twoFactor: TwoFactorData;
 }
 
-export default function Edit({ mustVerifyEmail, status, permissions }: Props) {
+export default function Edit({ mustVerifyEmail, status, permissions, twoFactor }: Props) {
     const { t } = useTranslation();
 
     // Determine which tabs should be visible
@@ -37,6 +45,9 @@ export default function Edit({ mustVerifyEmail, status, permissions }: Props) {
         // Password tab: always visible
         tabs.push('password');
 
+        // 2FA tab: always visible
+        tabs.push('two-factor');
+
         // Delete tab: visible if user has delete permission
         if (permissions.canDelete) {
             tabs.push('delete');
@@ -49,8 +60,10 @@ export default function Edit({ mustVerifyEmail, status, permissions }: Props) {
     const defaultTab = visibleTabs[0] || 'password';
 
     // Calculate grid columns based on number of visible tabs
-    const gridCols = visibleTabs.length === 1 ? 'grid-cols-1' :
-                     visibleTabs.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
+    const count = visibleTabs.length;
+    const gridCols = count === 1 ? 'grid-cols-1' :
+                     count === 2 ? 'grid-cols-2' :
+                     count === 3 ? 'grid-cols-3' : 'grid-cols-4';
 
     return (
         <AuthenticatedLayout
@@ -76,6 +89,10 @@ export default function Edit({ mustVerifyEmail, status, permissions }: Props) {
                                 <TabsTrigger value="password" className="gap-2">
                                     <Lock className="h-4 w-4" />
                                     {t('Update Password')}
+                                </TabsTrigger>
+                                <TabsTrigger value="two-factor" className="gap-2">
+                                    <ShieldCheck className="h-4 w-4" />
+                                    {t('Two-Factor Auth')}
                                 </TabsTrigger>
                                 {permissions.canDelete && (
                                     <TabsTrigger value="delete" className="gap-2">
@@ -115,6 +132,18 @@ export default function Edit({ mustVerifyEmail, status, permissions }: Props) {
 
                             <TabsContent value="password" className="mt-6">
                                 <UpdatePasswordForm />
+                            </TabsContent>
+
+                            <TabsContent value="two-factor" className="mt-6">
+                                <Card>
+                                    <CardContent className="p-6">
+                                        <TwoFactorAuthenticationForm
+                                            enabled={twoFactor.enabled}
+                                            required={twoFactor.required}
+                                            hasSecret={twoFactor.hasSecret}
+                                        />
+                                    </CardContent>
+                                </Card>
                             </TabsContent>
 
                             {permissions.canDelete && (

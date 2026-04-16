@@ -29,6 +29,11 @@ class ProfileController extends Controller
                 'canEdit' => $user->hasPermission('profile.edit'),
                 'canDelete' => $user->hasPermission('profile.delete'),
             ],
+            'twoFactor' => [
+                'enabled' => $user->hasEnabledTwoFactor(),
+                'required' => $user->two_factor_required,
+                'hasSecret' => !is_null($user->two_factor_secret),
+            ],
         ]);
     }
 

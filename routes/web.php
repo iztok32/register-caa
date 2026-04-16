@@ -18,7 +18,7 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'two-factor'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -108,6 +108,9 @@ Route::middleware('auth')->group(function () {
 
     // AircraftRegister Module
     Route::get('aircraft-register/aircraft', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'index'])->name('aircraft.index');
+
+    Route::get('aircraft-register/owners', [\App\Http\Controllers\AircraftRegister\OwnerController::class, 'index'])->name('owners.index');
+    Route::get('aircraft-register/owners/{empicId}', [\App\Http\Controllers\AircraftRegister\OwnerController::class, 'show'])->name('owners.show');
 });
 
 require __DIR__.'/auth.php';

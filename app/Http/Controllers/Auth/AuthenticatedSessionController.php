@@ -33,6 +33,18 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = $request->user();
+
+        // If user requires 2FA but hasn't set it up → redirect to forced setup
+        if ($user->two_factor_required && !$user->hasEnabledTwoFactor()) {
+            return redirect()->route('two-factor.setup');
+        }
+
+        // If user has 2FA enabled → redirect to challenge
+        if ($user->hasEnabledTwoFactor()) {
+            return redirect()->route('two-factor.challenge');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

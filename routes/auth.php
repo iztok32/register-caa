@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\TwoFactorAuthenticatedSessionController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +38,29 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    // Two-Factor Authentication Challenge (no two-factor middleware here)
+    Route::get('two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
+        ->name('two-factor.challenge');
+    Route::post('two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store']);
+
+    // Two-Factor Setup (for users who optionally or mandatorily want to set up 2FA)
+    Route::get('two-factor-setup', [TwoFactorController::class, 'setupRequired'])
+        ->name('two-factor.setup');
+    Route::post('two-factor/enable', [TwoFactorController::class, 'enable'])
+        ->name('two-factor.setup.enable');
+    Route::post('two-factor/confirm', [TwoFactorController::class, 'confirm'])
+        ->name('two-factor.setup.confirm');
+    Route::post('two-factor/disable', [TwoFactorController::class, 'disable'])
+        ->name('two-factor.setup.disable');
+    Route::get('two-factor/qr-code', [TwoFactorController::class, 'qrCode'])
+        ->name('two-factor.setup.qr-code');
+    Route::get('two-factor/secret-key', [TwoFactorController::class, 'secretKey'])
+        ->name('two-factor.setup.secret-key');
+    Route::get('two-factor/recovery-codes', [TwoFactorController::class, 'recoveryCodes'])
+        ->name('two-factor.setup.recovery-codes');
+    Route::post('two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])
+        ->name('two-factor.setup.recovery-codes.regenerate');
+
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 

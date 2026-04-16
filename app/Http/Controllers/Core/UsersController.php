@@ -43,6 +43,8 @@ class UsersController extends Controller
                     'email' => $user->email,
                     'gsm_number' => $user->gsm_number,
                     'is_active' => $user->is_active,
+                    'two_factor_required' => $user->two_factor_required,
+                    'two_factor_enabled' => $user->hasEnabledTwoFactor(),
                     'roles' => $user->roles->pluck('name'),
                     'created_at' => $user->created_at,
                     'deleted_at' => $user->deleted_at,
@@ -64,6 +66,7 @@ class UsersController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'gsm_number' => 'nullable|string|max:20',
             'is_active' => 'boolean',
+            'two_factor_required' => 'boolean',
             'role_id' => 'nullable|exists:roles,id',
         ]);
 
@@ -76,6 +79,7 @@ class UsersController extends Controller
         }
 
         $validated['is_active'] = $validated['is_active'] ?? true;
+        $validated['two_factor_required'] = $validated['two_factor_required'] ?? false;
 
         // Generate random password - user will reset via email
         $validated['password'] = bcrypt(bin2hex(random_bytes(16)));
@@ -115,6 +119,7 @@ class UsersController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'gsm_number' => 'nullable|string|max:20',
             'is_active' => 'boolean',
+            'two_factor_required' => 'boolean',
             'role_id' => 'nullable|exists:roles,id',
         ]);
 
@@ -131,6 +136,7 @@ class UsersController extends Controller
             'email' => $validated['email'],
             'gsm_number' => $validated['gsm_number'] ?? $user->gsm_number,
             'is_active' => $validated['is_active'] ?? $user->is_active,
+            'two_factor_required' => $validated['two_factor_required'] ?? $user->two_factor_required,
         ]);
 
         // Sync role if provided
