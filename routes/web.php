@@ -105,6 +105,9 @@ Route::middleware('auth')->group(function () {
     Route::get('user/config', [\App\Http\Controllers\UserConfigController::class, 'show'])->name('user.config.show');
     Route::post('user/config', [\App\Http\Controllers\UserConfigController::class, 'update'])->name('user.config.update');
     Route::post('user/config/batch', [\App\Http\Controllers\UserConfigController::class, 'updateBatch'])->name('user.config.batch');
+
+    // AircraftRegister Module
+    Route::get('aircraft-register/aircraft', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'index'])->name('aircraft.index');
 });
 
 require __DIR__.'/auth.php';
