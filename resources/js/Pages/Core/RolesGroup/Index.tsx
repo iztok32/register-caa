@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useTranslation } from '@/lib/i18n';
 import { PageProps } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -86,6 +86,20 @@ export default function Index({ roles, userRoles }: Props) {
     const [localRoles, setLocalRoles] = useState<Role[]>(roles);
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Sync localRoles and managingVisibilityRole when Inertia reloads the roles prop
+    useEffect(() => {
+        setLocalRoles(roles);
+    }, [roles]);
+
+    useEffect(() => {
+        if (managingVisibilityRole) {
+            const updated = roles.find(r => r.id === managingVisibilityRole.id);
+            if (updated) {
+                setManagingVisibilityRole(updated);
+            }
+        }
+    }, [roles]);
+
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -133,7 +147,7 @@ export default function Index({ roles, userRoles }: Props) {
         }
     };
 
-    const handleGrantVisibility = async (canSeeRoleId: number) => {
+    const handleGrantVisibility = (canSeeRoleId: number) => {
         if (!managingVisibilityRole) return;
 
         router.post(route('roles-group.grant-visibility'), {
@@ -141,29 +155,19 @@ export default function Index({ roles, userRoles }: Props) {
             can_see_role_id: canSeeRoleId,
         }, {
             preserveScroll: true,
-            preserveState: false, // Force reload to get fresh data
+            preserveState: false,
             onSuccess: async () => {
-                // Wait a bit for Inertia to reload, then refresh the dialog
-                setTimeout(async () => {
-                    const updatedRole = roles.find(r => r.id === managingVisibilityRole.id);
-                    if (updatedRole) {
-                        setManagingVisibilityRole(updatedRole);
-                    }
-
-                    // Fetch fresh available roles
-                    try {
-                        const response = await fetch(route('roles-group.available-roles', managingVisibilityRole.id));
-                        const data = await response.json();
-                        setAvailableRoles(data);
-                    } catch (error) {
-                        console.error('Failed to refresh available roles:', error);
-                    }
-                }, 100);
+                try {
+                    const response = await fetch(route('roles-group.available-roles', managingVisibilityRole.id));
+                    setAvailableRoles(await response.json());
+                } catch (error) {
+                    console.error('Failed to refresh available roles:', error);
+                }
             },
         });
     };
 
-    const handleRevokeVisibility = async (canSeeRoleId: number) => {
+    const handleRevokeVisibility = (canSeeRoleId: number) => {
         if (!managingVisibilityRole) return;
 
         router.post(route('roles-group.revoke-visibility'), {
@@ -171,24 +175,14 @@ export default function Index({ roles, userRoles }: Props) {
             can_see_role_id: canSeeRoleId,
         }, {
             preserveScroll: true,
-            preserveState: false, // Force reload to get fresh data
+            preserveState: false,
             onSuccess: async () => {
-                // Wait a bit for Inertia to reload, then refresh the dialog
-                setTimeout(async () => {
-                    const updatedRole = roles.find(r => r.id === managingVisibilityRole.id);
-                    if (updatedRole) {
-                        setManagingVisibilityRole(updatedRole);
-                    }
-
-                    // Fetch fresh available roles
-                    try {
-                        const response = await fetch(route('roles-group.available-roles', managingVisibilityRole.id));
-                        const data = await response.json();
-                        setAvailableRoles(data);
-                    } catch (error) {
-                        console.error('Failed to refresh available roles:', error);
-                    }
-                }, 100);
+                try {
+                    const response = await fetch(route('roles-group.available-roles', managingVisibilityRole.id));
+                    setAvailableRoles(await response.json());
+                } catch (error) {
+                    console.error('Failed to refresh available roles:', error);
+                }
             },
         });
     };

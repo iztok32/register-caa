@@ -14,9 +14,9 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'two-factor'])
+    ->name('dashboard');
 
 Route::middleware(['auth', 'two-factor'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -106,8 +106,19 @@ Route::middleware(['auth', 'two-factor'])->group(function () {
     Route::post('user/config', [\App\Http\Controllers\UserConfigController::class, 'update'])->name('user.config.update');
     Route::post('user/config/batch', [\App\Http\Controllers\UserConfigController::class, 'updateBatch'])->name('user.config.batch');
 
+    // OwnershipVerification Module
+    Route::prefix('ownership-verification')->name('ownership-verification.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\OwnershipVerificationController::class, 'index'])->name('index');
+        Route::post('/save-applicant', [\App\Http\Controllers\OwnershipVerificationController::class, 'saveApplicant'])->name('save-applicant');
+        Route::get('/search-subject', [\App\Http\Controllers\OwnershipVerificationController::class, 'searchSubject'])->name('search-subject');
+        Route::get('/get-aircraft', [\App\Http\Controllers\OwnershipVerificationController::class, 'getAircraftForOwner'])->name('get-aircraft');
+        Route::post('/send-request', [\App\Http\Controllers\OwnershipVerificationController::class, 'sendRequest'])->name('send-request');
+        Route::get('/print-document', [\App\Http\Controllers\OwnershipVerificationController::class, 'printDocument'])->name('print-document');
+    });
+
     // AircraftRegister Module
     Route::get('aircraft-register/aircraft', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'index'])->name('aircraft.index');
+    Route::get('aircraft-register/aircraft/{empicId}', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'show'])->name('aircraft.show');
 
     Route::get('aircraft-register/owners', [\App\Http\Controllers\AircraftRegister\OwnerController::class, 'index'])->name('owners.index');
     Route::get('aircraft-register/owners/{empicId}', [\App\Http\Controllers\AircraftRegister\OwnerController::class, 'show'])->name('owners.show');

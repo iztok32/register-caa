@@ -2,12 +2,13 @@ import { AppSidebar } from '@/Components/app-sidebar';
 import LanguageSwitcher from '@/Components/LanguageSwitcher';
 import ThemeToggle from '@/Components/ThemeToggle';
 import FlashMessages from '@/Components/FlashMessages';
-import { useTranslation } from '@/lib/i18n';
 import {
     Breadcrumb,
     BreadcrumbItem,
+    BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbPage,
+    BreadcrumbSeparator,
 } from '@/Components/ui/breadcrumb';
 import { Separator } from '@/Components/ui/separator';
 import {
@@ -15,7 +16,8 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from '@/Components/ui/sidebar';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import { Home } from 'lucide-react';
 import { PropsWithChildren, ReactNode } from 'react';
 import { PageProps } from '@/types';
 
@@ -25,8 +27,6 @@ export default function AuthenticatedLayout({
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { user } = usePage<PageProps>().props.auth;
     const { navigation } = usePage<PageProps>().props;
-    const { t } = useTranslation();
-
     return (
         <SidebarProvider>
             <AppSidebar user={user} navigation={navigation} />
@@ -37,11 +37,21 @@ export default function AuthenticatedLayout({
                         <Separator orientation="vertical" className="mr-2 h-4" />
                         <Breadcrumb>
                             <BreadcrumbList>
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>
-                                        {header || t('Dashboard')}
-                                    </BreadcrumbPage>
+                                <BreadcrumbItem className="hidden md:block">
+                                    <BreadcrumbLink asChild>
+                                        <Link href={route('dashboard')} aria-label="Home">
+                                            <Home className="h-4 w-4" />
+                                        </Link>
+                                    </BreadcrumbLink>
                                 </BreadcrumbItem>
+                                {header && (
+                                    <>
+                                        <BreadcrumbSeparator className="hidden md:block" />
+                                        <BreadcrumbItem>
+                                            <BreadcrumbPage>{header}</BreadcrumbPage>
+                                        </BreadcrumbItem>
+                                    </>
+                                )}
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>

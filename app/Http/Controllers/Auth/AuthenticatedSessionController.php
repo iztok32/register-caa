@@ -35,6 +35,11 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
+        // Store previous login time in session before updating
+        $request->session()->put('auth.previous_login_at', $user->last_login_at);
+        $user->last_login_at = now();
+        $user->saveQuietly();
+
         // If user requires 2FA but hasn't set it up → redirect to forced setup
         if ($user->two_factor_required && !$user->hasEnabledTwoFactor()) {
             return redirect()->route('two-factor.setup');

@@ -153,6 +153,23 @@ class NavigationSeeder extends Seeder
                 'updated_at' => now(),
             ],
 
+            // Ownership Verification
+            [
+                'id' => 23,
+                'parent_id' => null,
+                'type' => 'settings',
+                'title_key' => 'Ownership Verification',
+                'url' => '/ownership-verification',
+                'icon' => 'FileSearch',
+                'metadata' => json_encode([]),
+                'sort_order' => 3,
+                'is_active' => true,
+                'permission' => null,
+                'allowed_roles' => json_encode(['superadmin', 'admin', 'operator', 'qualified-user']),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
             // Users items
             [
                 'id' => 20,

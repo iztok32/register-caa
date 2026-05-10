@@ -115,4 +115,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'caa_request_to' => env('MAIL_CAA_REQUEST_TO', 'breda.marinsek@caa.si'),
+
 ];
