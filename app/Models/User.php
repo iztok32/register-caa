@@ -35,7 +35,10 @@ class User extends Authenticatable implements AuditableContract
         'doc_post_num',
         'doc_post_office',
         'doc_tax',
+        'doc_registration',
+        'doc_contact',
         'doc_legal_basis',
+        'qualification_requested_at',
     ];
 
     /**
@@ -61,6 +64,7 @@ class User extends Authenticatable implements AuditableContract
             'email_verified_at' => 'datetime',
             'two_factor_confirmed_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'qualification_requested_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
             'two_factor_required' => 'boolean',

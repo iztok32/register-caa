@@ -24,13 +24,15 @@ interface Applicant {
 }
 
 interface Subject {
-    empic_id: number;
+    empic_id: number | null;
     display_name: string;
     owner_type: 'organisation' | 'person';
     address: string;
     zip_code: string;
     city: string;
-    tax: string;
+    tax: string | null;
+    registration_number: string | null;
+    source: string;
 }
 
 interface AircraftResult {
@@ -353,9 +355,9 @@ export default function Index({ applicant: initialApplicant }: Props) {
                                 {/* Dropdown results */}
                                 {searchResults.length > 0 && (
                                     <div className="absolute z-20 left-0 right-0 top-full mt-1 bg-background border rounded-lg shadow-xl max-h-72 overflow-y-auto">
-                                        {searchResults.map(s => (
+                                        {searchResults.map((s, i) => (
                                             <button
-                                                key={s.empic_id}
+                                                key={s.empic_id != null ? `empic-${s.empic_id}` : s.tax ? `tax-${s.tax}` : `idx-${i}`}
                                                 type="button"
                                                 className="w-full text-left px-4 py-3 hover:bg-muted/60 border-b last:border-0 flex items-start gap-2.5 transition-colors"
                                                 onClick={() => selectSubject(s)}

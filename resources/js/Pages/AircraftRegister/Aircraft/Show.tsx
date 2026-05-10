@@ -9,7 +9,7 @@ import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
 import {
     ArrowLeft, Plane, Building2, User, CalendarDays,
-    Hash, ShieldCheck, Wrench,
+    Hash, ShieldCheck, Wrench, Lock,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -44,6 +44,7 @@ interface OwnerEntry {
 interface Props extends PageProps {
     aircraft: AircraftData;
     ownershipHistory: OwnerEntry[];
+    canViewOwnership: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -81,7 +82,7 @@ function InfoRow({ label, value }: { label: string; value: string | number | nul
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function Show({ aircraft, ownershipHistory }: Props) {
+export default function Show({ aircraft, ownershipHistory, canViewOwnership }: Props) {
     const { t } = useTranslation();
 
     const activeEntries = ownershipHistory.filter(e => !e.is_closed);
@@ -148,118 +149,127 @@ export default function Show({ aircraft, ownershipHistory }: Props) {
                     {/* ── Ownership history ──────────────────────────────── */}
                     <div className="lg:col-span-2 flex flex-col gap-5">
 
-                        {/* Active */}
-                        <div className="rounded-xl border bg-card">
-                            <div className="px-5 py-4 border-b flex items-center gap-2">
-                                <ShieldCheck className="h-4 w-4 text-primary" />
-                                <h3 className="font-semibold">{t('Active owners & operators')}</h3>
-                                {activeEntries.length > 0 && (
-                                    <Badge className="ml-1">{activeEntries.length}</Badge>
-                                )}
+                        {!canViewOwnership ? (
+                            <div className="rounded-xl border bg-card flex flex-col items-center justify-center py-14 gap-3 text-muted-foreground">
+                                <Lock className="h-8 w-8" />
+                                <p className="text-sm font-medium">{t('Ownership data is not available for your account.')}</p>
                             </div>
+                        ) : (
+                            <>
+                                {/* Active */}
+                                <div className="rounded-xl border bg-card">
+                                    <div className="px-5 py-4 border-b flex items-center gap-2">
+                                        <ShieldCheck className="h-4 w-4 text-primary" />
+                                        <h3 className="font-semibold">{t('Active owners & operators')}</h3>
+                                        {activeEntries.length > 0 && (
+                                            <Badge className="ml-1">{activeEntries.length}</Badge>
+                                        )}
+                                    </div>
 
-                            {activeEntries.length === 0 ? (
-                                <p className="text-sm text-muted-foreground text-center py-8">
-                                    {t('No active owners or operators recorded.')}
-                                </p>
-                            ) : (
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-muted/30">
-                                            <TableHead className="font-semibold">{t('Name')}</TableHead>
-                                            <TableHead className="font-semibold">{t('Role')}</TableHead>
-                                            <TableHead className="font-semibold">{t('Since')}</TableHead>
-                                            <TableHead className="font-semibold text-right">%</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {activeEntries.map((e) => (
-                                            <TableRow
-                                                key={e.id}
-                                                className="hover:bg-muted/30 cursor-pointer"
-                                                onClick={() => e.owner && router.get(route('owners.show', { empicId: e.owner.empic_id }))}
-                                            >
-                                                <TableCell>
-                                                    <div className="flex items-center gap-2">
-                                                        {e.owner?.type === 'organisation'
-                                                            ? <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                                            : <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                                                        }
-                                                        <span className="font-medium">{e.owner?.name ?? '—'}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <RoleIcon role={e.role} />
-                                                        <span className="text-sm">{e.role ?? '—'}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                                        <CalendarDays className="h-3.5 w-3.5" />
-                                                        {formatDate(e.effective_start)}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right text-sm text-muted-foreground">
-                                                    {e.ownership_percentage ? `${e.ownership_percentage}%` : '—'}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            )}
-                        </div>
-
-                        {/* Historical */}
-                        {closedEntries.length > 0 && (
-                            <div className="rounded-xl border bg-card">
-                                <div className="px-5 py-4 border-b flex items-center gap-2 text-muted-foreground">
-                                    <CalendarDays className="h-4 w-4" />
-                                    <h3 className="font-semibold">{t('Historical owners & operators')}</h3>
-                                    <Badge variant="outline" className="ml-1">{closedEntries.length}</Badge>
+                                    {activeEntries.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground text-center py-8">
+                                            {t('No active owners or operators recorded.')}
+                                        </p>
+                                    ) : (
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow className="bg-muted/30">
+                                                    <TableHead className="font-semibold">{t('Name')}</TableHead>
+                                                    <TableHead className="font-semibold">{t('Role')}</TableHead>
+                                                    <TableHead className="font-semibold">{t('Since')}</TableHead>
+                                                    <TableHead className="font-semibold text-right">%</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {activeEntries.map((e) => (
+                                                    <TableRow
+                                                        key={e.id}
+                                                        className="hover:bg-muted/30 cursor-pointer"
+                                                        onClick={() => e.owner && router.get(route('owners.show', { empicId: e.owner.empic_id }))}
+                                                    >
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-2">
+                                                                {e.owner?.type === 'organisation'
+                                                                    ? <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                                                    : <User className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                                                }
+                                                                <span className="font-medium">{e.owner?.name ?? '—'}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <RoleIcon role={e.role} />
+                                                                <span className="text-sm">{e.role ?? '—'}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                                                <CalendarDays className="h-3.5 w-3.5" />
+                                                                {formatDate(e.effective_start)}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-right text-sm text-muted-foreground">
+                                                            {e.ownership_percentage ? `${e.ownership_percentage}%` : '—'}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    )}
                                 </div>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow className="bg-muted/30">
-                                            <TableHead className="font-semibold">{t('Name')}</TableHead>
-                                            <TableHead className="font-semibold">{t('Role')}</TableHead>
-                                            <TableHead className="font-semibold">{t('Period')}</TableHead>
-                                            <TableHead className="font-semibold text-right">%</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {closedEntries.map((e) => (
-                                            <TableRow
-                                                key={e.id}
-                                                className="opacity-60 hover:opacity-100 hover:bg-muted/30 cursor-pointer transition-opacity"
-                                                onClick={() => e.owner && router.get(route('owners.show', { empicId: e.owner.empic_id }))}
-                                            >
-                                                <TableCell>
-                                                    <div className="flex items-center gap-2">
-                                                        {e.owner?.type === 'organisation'
-                                                            ? <Building2 className="h-3.5 w-3.5 shrink-0" />
-                                                            : <User className="h-3.5 w-3.5 shrink-0" />
-                                                        }
-                                                        <span className="font-medium">{e.owner?.name ?? '—'}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <RoleIcon role={e.role} />
-                                                        <span className="text-sm">{e.role ?? '—'}</span>
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-sm">
-                                                    {formatDate(e.effective_start)} – {formatDate(e.end_date)}
-                                                </TableCell>
-                                                <TableCell className="text-right text-sm">
-                                                    {e.ownership_percentage ? `${e.ownership_percentage}%` : '—'}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
+
+                                {/* Historical */}
+                                {closedEntries.length > 0 && (
+                                    <div className="rounded-xl border bg-card">
+                                        <div className="px-5 py-4 border-b flex items-center gap-2 text-muted-foreground">
+                                            <CalendarDays className="h-4 w-4" />
+                                            <h3 className="font-semibold">{t('Historical owners & operators')}</h3>
+                                            <Badge variant="outline" className="ml-1">{closedEntries.length}</Badge>
+                                        </div>
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow className="bg-muted/30">
+                                                    <TableHead className="font-semibold">{t('Name')}</TableHead>
+                                                    <TableHead className="font-semibold">{t('Role')}</TableHead>
+                                                    <TableHead className="font-semibold">{t('Period')}</TableHead>
+                                                    <TableHead className="font-semibold text-right">%</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {closedEntries.map((e) => (
+                                                    <TableRow
+                                                        key={e.id}
+                                                        className="opacity-60 hover:opacity-100 hover:bg-muted/30 cursor-pointer transition-opacity"
+                                                        onClick={() => e.owner && router.get(route('owners.show', { empicId: e.owner.empic_id }))}
+                                                    >
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-2">
+                                                                {e.owner?.type === 'organisation'
+                                                                    ? <Building2 className="h-3.5 w-3.5 shrink-0" />
+                                                                    : <User className="h-3.5 w-3.5 shrink-0" />
+                                                                }
+                                                                <span className="font-medium">{e.owner?.name ?? '—'}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <RoleIcon role={e.role} />
+                                                                <span className="text-sm">{e.role ?? '—'}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-sm">
+                                                            {formatDate(e.effective_start)} – {formatDate(e.end_date)}
+                                                        </TableCell>
+                                                        <TableCell className="text-right text-sm">
+                                                            {e.ownership_percentage ? `${e.ownership_percentage}%` : '—'}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                )}
+                            </>
                         )}
 
                     </div>

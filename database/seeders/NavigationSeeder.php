@@ -186,6 +186,21 @@ class NavigationSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'id' => 24,
+                'parent_id' => null,
+                'type' => 'users',
+                'title_key' => 'Zahteva za kvalificiran dostop',
+                'url' => '/qualification-request',
+                'icon' => 'UserCheck',
+                'metadata' => json_encode([]),
+                'sort_order' => 1,
+                'is_active' => true,
+                'permission' => null,
+                'allowed_roles' => json_encode(['user']),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         foreach ($navigationItems as $item) {

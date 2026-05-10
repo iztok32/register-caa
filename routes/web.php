@@ -106,6 +106,12 @@ Route::middleware(['auth', 'two-factor'])->group(function () {
     Route::post('user/config', [\App\Http\Controllers\UserConfigController::class, 'update'])->name('user.config.update');
     Route::post('user/config/batch', [\App\Http\Controllers\UserConfigController::class, 'updateBatch'])->name('user.config.batch');
 
+    // Qualification Request
+    Route::prefix('qualification-request')->name('qualification-request.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\QualificationRequestController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\QualificationRequestController::class, 'store'])->name('store');
+    });
+
     // OwnershipVerification Module
     Route::prefix('ownership-verification')->name('ownership-verification.')->group(function () {
         Route::get('/', [\App\Http\Controllers\OwnershipVerificationController::class, 'index'])->name('index');

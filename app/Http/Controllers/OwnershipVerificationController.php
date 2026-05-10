@@ -112,8 +112,12 @@ class OwnershipVerificationController extends Controller
                 'source'              => 'ajpes',
             ]);
 
-        // Merge, deduplicate by tax_number, falling back to registration_number (prefer register entries)
-        $taxMap = $results->keyBy('tax')->all();
+        // Merge, deduplicate by tax_number or registration_number (prefer register entries first)
+        $taxMap = [];
+        foreach ($results as $entry) {
+            $key = $entry['tax'] ?: ('empic:' . ($entry['empic_id'] ?? uniqid()));
+            $taxMap[$key] = $entry;
+        }
         foreach ($taxEntries as $entry) {
             $key = $entry['tax'] ?: ('reg:' . ($entry['registration_number'] ?? uniqid()));
             if (!isset($taxMap[$key])) {
@@ -146,7 +150,11 @@ class OwnershipVerificationController extends Controller
 
     public function getAircraftForOwner(Request $request): JsonResponse
     {
-        $empicId = $request->input('empic_id');
+        $empicId = $request->integer('empic_id', 0) ?: null;
+
+        if (!$empicId) {
+            return response()->json(['aircraft' => []]);
+        }
 
         $aircraft = AircraftOwner::with('aircraft')
             ->where('owner_empic_id', $empicId)

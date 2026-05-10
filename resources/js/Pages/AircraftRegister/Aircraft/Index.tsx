@@ -37,6 +37,7 @@ interface Props extends PageProps {
         total: number;
     };
     filters: { search: string };
+    canViewOwnership: boolean;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -44,7 +45,7 @@ const STATUS_STYLES: Record<string, string> = {
     Deregistered: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 };
 
-export default function Index({ aircrafts, filters }: Props) {
+export default function Index({ aircrafts, filters, canViewOwnership }: Props) {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
 
@@ -89,14 +90,16 @@ export default function Index({ aircrafts, filters }: Props) {
                                 <TableHead className="font-semibold">{t('Registration')}</TableHead>
                                 <TableHead className="font-semibold">{t('Manufacturer & Type')}</TableHead>
                                 <TableHead className="font-semibold">{t('Serial No.')}</TableHead>
-                                <TableHead className="font-semibold">{t('Status')}</TableHead>
-                                <TableHead className="font-semibold">{t('Owners / Operators')}</TableHead>
+                                        <TableHead className="font-semibold">{t('Status')}</TableHead>
+                                {canViewOwnership && (
+                                    <TableHead className="font-semibold">{t('Owners / Operators')}</TableHead>
+                                )}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {aircrafts.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                    <TableCell colSpan={canViewOwnership ? 5 : 4} className="h-24 text-center text-muted-foreground">
                                         {t('No aircraft found.')}
                                     </TableCell>
                                 </TableRow>
@@ -122,20 +125,22 @@ export default function Index({ aircrafts, filters }: Props) {
                                                 {aircraft.status || t('Unknown')}
                                             </span>
                                         </TableCell>
-                                        <TableCell>
-                                            {aircraft.current_owners && aircraft.current_owners.filter(o => !o.is_closed).length > 0 ? (
-                                                <div className="space-y-0.5">
-                                                    {aircraft.current_owners.filter(o => !o.is_closed).map((o, i) => (
-                                                        <div key={i} className="text-sm flex items-center gap-1.5">
-                                                            <span className="text-foreground">{o.name}</span>
-                                                            <span className="text-muted-foreground text-xs">({o.role})</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <span className="text-muted-foreground text-xs">{t('No recorded owners')}</span>
-                                            )}
-                                        </TableCell>
+                                        {canViewOwnership && (
+                                            <TableCell>
+                                                {aircraft.current_owners && aircraft.current_owners.filter(o => !o.is_closed).length > 0 ? (
+                                                    <div className="space-y-0.5">
+                                                        {aircraft.current_owners.filter(o => !o.is_closed).map((o, i) => (
+                                                            <div key={i} className="text-sm flex items-center gap-1.5">
+                                                                <span className="text-foreground">{o.name}</span>
+                                                                <span className="text-muted-foreground text-xs">({o.role})</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-xs">{t('No recorded owners')}</span>
+                                                )}
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))
                             )}
