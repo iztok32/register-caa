@@ -563,5 +563,19 @@
     "Your request has been submitted.": "Vaša vloga je bila oddana.",
     "We will review your request and notify you at": "Vašo vlogo bomo pregledali in vas obvestili na",
     "Submitted on": "Oddano",
-    "Zahteva za kvalificiran dostop": "Zahteva za kvalificiran dostop"
+    "Zahteva za kvalificiran dostop": "Zahteva za kvalificiran dostop",
+    "System Settings": "Sistemske nastavitve",
+    "Parameters": "Parametri",
+    "Access Settings": "Nastavitve dostopa",
+    "Security Settings": "Varnostne nastavitve",
+    "Public access enabled": "Javni dostop omogočen",
+    "Public access description": "Ko je omogočeno, je register zrakoplovov dostopen brez prijave.",
+    "Global 2FA required": "Globalna 2FA zahteva",
+    "Global 2FA description": "Ko je omogočeno, je dvostopenjska avtentikacija obvezna za vse uporabnike.",
+    "Setting saved.": "Nastavitev shranjena.",
+    "Enabled": "Omogočeno",
+    "Disabled": "Onemogočeno",
+    "Search by registration, manufacturer or type": "Iskanje po registrski oznaki, proizvajalcu ali tipu",
+    "Search by registration mark, manufacturer, type...": "Registrska oznaka, proizvajalec, tip...",
+    "Enter at least 2 characters to search": "Vnesite vsaj 2 znaka za iskanje"
 }

@@ -563,5 +563,16 @@
     "Your request has been submitted.": "Ihr Antrag wurde eingereicht.",
     "We will review your request and notify you at": "Wir werden Ihren Antrag prüfen und Sie benachrichtigen unter",
     "Submitted on": "Eingereicht am",
-    "Zahteva za kvalificiran dostop": "Antrag auf qualifizierten Zugang"
+    "Zahteva za kvalificiran dostop": "Antrag auf qualifizierten Zugang",
+    "System Settings": "Systemeinstellungen",
+    "Parameters": "Parameter",
+    "Access Settings": "Zugriffseinstellungen",
+    "Security Settings": "Sicherheitseinstellungen",
+    "Public access enabled": "Öffentlicher Zugang aktiviert",
+    "Public access description": "Wenn aktiviert, ist das Luftfahrzeugregister ohne Anmeldung zugänglich.",
+    "Global 2FA required": "Globale 2FA erforderlich",
+    "Global 2FA description": "Wenn aktiviert, ist die Zwei-Faktor-Authentifizierung für alle Benutzer obligatorisch.",
+    "Setting saved.": "Einstellung gespeichert.",
+    "Enabled": "Aktiviert",
+    "Disabled": "Deaktiviert"
 }

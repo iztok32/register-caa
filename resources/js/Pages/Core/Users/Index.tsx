@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Plus, Edit2, Trash2, Mail, Check, X, Search, LayoutGrid, LayoutList } from 'lucide-react';
+import { Plus, Edit2, Trash2, Mail, Check, X, Search, LayoutGrid, LayoutList, FileDown } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { PageProps } from '@/types';
 import {
     Table,
@@ -39,6 +40,7 @@ interface User {
     email: string;
     is_active: boolean;
     roles: string[];
+    last_login_at: string | null;
     created_at: string;
     deleted_at: string | null;
 }
@@ -118,6 +120,26 @@ export default function Index({ users, roles }: Props) {
         );
     });
 
+    const handleExport = () => {
+        const rows = filteredUsers.map(u => ({
+            [t('Email')]:      u.email,
+            [t('Name')]:       u.name,
+            [t('Last login')]: u.last_login_at
+                ? new Date(u.last_login_at).toLocaleString('sl-SI')
+                : '',
+            [t('Role')]:       u.roles.join(', '),
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(rows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, t('Users'));
+
+        const colWidths = [{ wch: 40 }, { wch: 30 }, { wch: 22 }, { wch: 30 }];
+        ws['!cols'] = colWidths;
+
+        XLSX.writeFile(wb, `users_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -159,6 +181,15 @@ export default function Index({ users, roles }: Props) {
                                 title={t('Card view')}
                             >
                                 <LayoutGrid className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-9 w-9 p-0"
+                                onClick={handleExport}
+                                title={t('Export to Excel')}
+                            >
+                                <FileDown className="h-4 w-4" />
                             </Button>
                             {canCreate && (
                                 <Button onClick={handleCreate} size="sm" className="gap-2">

@@ -563,5 +563,19 @@
     "Your request has been submitted.": "Your request has been submitted.",
     "We will review your request and notify you at": "We will review your request and notify you at",
     "Submitted on": "Submitted on",
-    "Zahteva za kvalificiran dostop": "Request Qualified Access"
+    "Zahteva za kvalificiran dostop": "Request Qualified Access",
+    "System Settings": "System Settings",
+    "Parameters": "Parameters",
+    "Access Settings": "Access Settings",
+    "Security Settings": "Security Settings",
+    "Public access enabled": "Public access enabled",
+    "Public access description": "When enabled, the aircraft register is accessible without login.",
+    "Global 2FA required": "Global 2FA required",
+    "Global 2FA description": "When enabled, two-factor authentication is mandatory for all users.",
+    "Setting saved.": "Setting saved.",
+    "Enabled": "Enabled",
+    "Disabled": "Disabled",
+    "Search by registration, manufacturer or type": "Search by registration, manufacturer or type",
+    "Search by registration mark, manufacturer, type...": "Registration mark, manufacturer, type...",
+    "Enter at least 2 characters to search": "Enter at least 2 characters to search"
 }

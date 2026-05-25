@@ -563,5 +563,16 @@
     "Your request has been submitted.": "La tua richiesta è stata inviata.",
     "We will review your request and notify you at": "Esamineremo la tua richiesta e ti informeremo a",
     "Submitted on": "Inviato il",
-    "Zahteva za kvalificiran dostop": "Richiesta accesso qualificato"
+    "Zahteva za kvalificiran dostop": "Richiesta accesso qualificato",
+    "System Settings": "Impostazioni di sistema",
+    "Parameters": "Parametri",
+    "Access Settings": "Impostazioni di accesso",
+    "Security Settings": "Impostazioni di sicurezza",
+    "Public access enabled": "Accesso pubblico abilitato",
+    "Public access description": "Quando abilitato, il registro degli aeromobili è accessibile senza accesso.",
+    "Global 2FA required": "2FA globale richiesto",
+    "Global 2FA description": "Quando abilitato, l'autenticazione a due fattori è obbligatoria per tutti gli utenti.",
+    "Setting saved.": "Impostazione salvata.",
+    "Enabled": "Abilitato",
+    "Disabled": "Disabilitato"
 }

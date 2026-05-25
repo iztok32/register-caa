@@ -33,7 +33,7 @@ export default function LanguageSwitcher() {
                 <span className="inline-flex rounded-md">
                     <button
                         type="button"
-                        className="inline-flex items-center rounded-md border border-transparent bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-gray-500 dark:text-gray-400 transition duration-150 ease-in-out hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none uppercase"
+                        className="inline-flex items-center rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-medium leading-4 text-gray-500 dark:text-gray-400 transition duration-150 ease-in-out hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none uppercase"
                     >
                         {flagImages[locale] && (
                             <img

@@ -1,18 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [\App\Http\Controllers\PublicController::class, 'index'])->name('home');
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'two-factor'])
@@ -121,6 +112,10 @@ Route::middleware(['auth', 'two-factor'])->group(function () {
         Route::post('/send-request', [\App\Http\Controllers\OwnershipVerificationController::class, 'sendRequest'])->name('send-request');
         Route::get('/print-document', [\App\Http\Controllers\OwnershipVerificationController::class, 'printDocument'])->name('print-document');
     });
+
+    // Settings routes
+    Route::get('settings', [\App\Http\Controllers\Core\SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('settings/{key}', [\App\Http\Controllers\Core\SettingsController::class, 'update'])->name('settings.update');
 
     // AircraftRegister Module
     Route::get('aircraft-register/aircraft', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'index'])->name('aircraft.index');

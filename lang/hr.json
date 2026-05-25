@@ -563,5 +563,16 @@
     "Your request has been submitted.": "Vaš zahtjev je poslan.",
     "We will review your request and notify you at": "Pregledat ćemo vaš zahtjev i obavijestiti vas na",
     "Submitted on": "Podneseno",
-    "Zahteva za kvalificiran dostop": "Zahtjev za kvalificirani pristup"
+    "Zahteva za kvalificiran dostop": "Zahtjev za kvalificirani pristup",
+    "System Settings": "Sistemske postavke",
+    "Parameters": "Parametri",
+    "Access Settings": "Postavke pristupa",
+    "Security Settings": "Sigurnosne postavke",
+    "Public access enabled": "Javni pristup omogućen",
+    "Public access description": "Kada je omogućeno, registar zrakoplova dostupan je bez prijave.",
+    "Global 2FA required": "Globalni 2FA obavezan",
+    "Global 2FA description": "Kada je omogućeno, dvofaktorska autentifikacija obvezna je za sve korisnike.",
+    "Setting saved.": "Postavka spremljena.",
+    "Enabled": "Omogućeno",
+    "Disabled": "Onemogućeno"
 }

@@ -46,6 +46,7 @@ class UsersController extends Controller
                     'two_factor_required' => $user->two_factor_required,
                     'two_factor_enabled' => $user->hasEnabledTwoFactor(),
                     'roles' => $user->roles->pluck('name'),
+                    'last_login_at' => $user->last_login_at,
                     'created_at' => $user->created_at,
                     'deleted_at' => $user->deleted_at,
                 ];
