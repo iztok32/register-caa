@@ -7,16 +7,68 @@ import { Field, FieldGroup, FieldLabel } from '@/Components/ui/field'
 import InputError from '@/Components/InputError'
 import { useTranslation } from '@/lib/i18n'
 import GuestLayout from '@/Layouts/GuestLayout'
-import { ShieldCheck, Copy, CheckCircle2 } from 'lucide-react'
+import { ShieldCheck, Smartphone, ScanLine, KeyRound, Copy, CheckCircle2, Check } from 'lucide-react'
 import axios from 'axios'
 
 interface Props {
     hasSecret: boolean
 }
 
+type Step = 'intro' | 'qr' | 'recovery'
+
+const STEPS = [
+    { key: 'intro',    icon: Smartphone, labelKey: 'Install app' },
+    { key: 'qr',       icon: ScanLine,   labelKey: 'Scan & confirm' },
+    { key: 'recovery', icon: KeyRound,   labelKey: 'Recovery codes' },
+] as const
+
+function StepIndicator({ current }: { current: Step }) {
+    const { t } = useTranslation()
+    const currentIndex = STEPS.findIndex(s => s.key === current)
+
+    return (
+        <div className="flex items-center justify-center gap-0 mb-6">
+            {STEPS.map((step, index) => {
+                const Icon = step.icon
+                const done = index < currentIndex
+                const active = index === currentIndex
+
+                return (
+                    <div key={step.key} className="flex items-center">
+                        <div className="flex flex-col items-center gap-1">
+                            <div className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors ${
+                                done
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : active
+                                        ? 'border-primary bg-primary/10 text-primary'
+                                        : 'border-muted-foreground/30 bg-muted text-muted-foreground'
+                            }`}>
+                                {done
+                                    ? <Check className="h-4 w-4" />
+                                    : <Icon className="h-4 w-4" />
+                                }
+                            </div>
+                            <span className={`text-xs font-medium whitespace-nowrap ${
+                                active ? 'text-primary' : 'text-muted-foreground'
+                            }`}>
+                                {t(step.labelKey)}
+                            </span>
+                        </div>
+                        {index < STEPS.length - 1 && (
+                            <div className={`h-0.5 w-12 mb-4 mx-1 transition-colors ${
+                                index < currentIndex ? 'bg-primary' : 'bg-muted-foreground/20'
+                            }`} />
+                        )}
+                    </div>
+                )
+            })}
+        </div>
+    )
+}
+
 export default function TwoFactorSetupRequired({ hasSecret }: Props) {
     const { t } = useTranslation()
-    const [step, setStep] = useState<'intro' | 'qr' | 'confirm' | 'recovery'>('intro')
+    const [step, setStep] = useState<Step>('intro')
     const [qrCode, setQrCode] = useState<string | null>(null)
     const [secretKey, setSecretKey] = useState<string | null>(null)
     const [recoveryCodes, setRecoveryCodes] = useState<string[]>([])
@@ -70,7 +122,6 @@ export default function TwoFactorSetupRequired({ hasSecret }: Props) {
         router.visit(route('dashboard'))
     }
 
-    // If secret already generated (page reload), go to qr step
     useEffect(() => {
         if (hasSecret) {
             loadQrCode()
@@ -83,8 +134,8 @@ export default function TwoFactorSetupRequired({ hasSecret }: Props) {
             <Head title={t('Set Up Two-Factor Authentication')} />
             <div className="flex flex-col gap-6 max-w-md mx-auto w-full">
                 <Card className="shadow-lg">
-                    <CardHeader className="text-center">
-                        <div className="flex justify-center mb-2">
+                    <CardHeader className="text-center pb-2">
+                        <div className="flex justify-center mb-3">
                             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
                                 <ShieldCheck className="h-7 w-7" />
                             </div>
@@ -94,11 +145,32 @@ export default function TwoFactorSetupRequired({ hasSecret }: Props) {
                             {t('Your account requires two-factor authentication. Please complete the setup to continue.')}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
+
+                    <CardContent className="pt-4">
+                        <StepIndicator current={step} />
+
+                        {/* ── Korak 1: Namestitev aplikacije ── */}
                         {step === 'intro' && (
                             <FieldGroup>
-                                <p className="text-sm text-muted-foreground text-center mb-4">
-                                    {t('You will need an authenticator app such as Google Authenticator or Authy to complete this setup.')}
+                                <div className="rounded-lg bg-muted/50 border p-4 space-y-3 text-sm">
+                                    <p className="font-medium">{t('What you need:')}</p>
+                                    <ul className="space-y-2 text-muted-foreground">
+                                        <li className="flex items-start gap-2">
+                                            <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                                            {t('A smartphone with an authenticator app')}
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                                            {t('Recommended: Google Authenticator, Authy or Microsoft Authenticator')}
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                                            {t('The app is free and available on iOS and Android')}
+                                        </li>
+                                    </ul>
+                                </div>
+                                <p className="text-xs text-muted-foreground text-center">
+                                    {t('After setup, you will confirm each login with a 6-digit code from the app.')}
                                 </p>
                                 <Button
                                     className="w-full"
@@ -110,24 +182,35 @@ export default function TwoFactorSetupRequired({ hasSecret }: Props) {
                             </FieldGroup>
                         )}
 
+                        {/* ── Korak 2: Skeniranje QR kode ── */}
                         {step === 'qr' && (
                             <form onSubmit={handleConfirm}>
                                 <FieldGroup>
-                                    <p className="text-sm text-muted-foreground text-center">
-                                        {t('Scan the QR code below with your authenticator app, then enter the 6-digit code to confirm.')}
-                                    </p>
+                                    <div className="rounded-lg bg-muted/50 border p-4 space-y-2 text-sm text-muted-foreground">
+                                        <p className="font-medium text-foreground">{t('Instructions:')}</p>
+                                        <ol className="space-y-1.5 list-decimal list-inside">
+                                            <li>{t('Open your authenticator app')}</li>
+                                            <li>{t('Tap "Add account" or the + button')}</li>
+                                            <li>{t('Scan the QR code below')}</li>
+                                            <li>{t('Enter the 6-digit code shown in the app')}</li>
+                                        </ol>
+                                    </div>
 
                                     {qrCode && (
                                         <div
-                                            className="flex justify-center p-4 bg-white rounded-lg"
+                                            className="flex justify-center p-4 bg-white rounded-lg border"
                                             dangerouslySetInnerHTML={{ __html: qrCode }}
                                         />
                                     )}
 
                                     {secretKey && (
                                         <div className="text-center">
-                                            <p className="text-xs text-muted-foreground mb-1">{t('Or enter the code manually:')}</p>
-                                            <code className="text-sm font-mono bg-muted px-3 py-1 rounded select-all">{secretKey}</code>
+                                            <p className="text-xs text-muted-foreground mb-1">
+                                                {t('Cannot scan? Enter the code manually:')}
+                                            </p>
+                                            <code className="text-sm font-mono bg-muted px-3 py-1.5 rounded select-all block text-center break-all">
+                                                {secretKey}
+                                            </code>
                                         </div>
                                     )}
 
@@ -155,20 +238,26 @@ export default function TwoFactorSetupRequired({ hasSecret }: Props) {
                             </form>
                         )}
 
+                        {/* ── Korak 3: Varnostne kode ── */}
                         {step === 'recovery' && (
                             <FieldGroup>
-                                <div className="flex items-center gap-2 text-green-600 justify-center mb-2">
+                                <div className="flex items-center gap-2 text-green-600 justify-center mb-1">
                                     <CheckCircle2 className="h-5 w-5" />
                                     <span className="font-medium">{t('Two-factor authentication enabled!')}</span>
                                 </div>
 
-                                <p className="text-sm text-muted-foreground text-center">
-                                    {t('Save these recovery codes in a safe place. Each code can only be used once if you lose access to your authenticator app.')}
-                                </p>
+                                <div className="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4 text-sm space-y-1.5">
+                                    <p className="font-medium text-amber-800 dark:text-amber-300">
+                                        {t('Important — save your recovery codes!')}
+                                    </p>
+                                    <p className="text-amber-700 dark:text-amber-400 text-xs">
+                                        {t('If you lose access to your authenticator app, you can use one of these codes to log in. Each code can only be used once.')}
+                                    </p>
+                                </div>
 
                                 <div className="bg-muted rounded-lg p-4 font-mono text-sm space-y-1">
                                     {recoveryCodes.map((code, i) => (
-                                        <div key={i} className="text-center">{code}</div>
+                                        <div key={i} className="text-center tracking-wider">{code}</div>
                                     ))}
                                 </div>
 

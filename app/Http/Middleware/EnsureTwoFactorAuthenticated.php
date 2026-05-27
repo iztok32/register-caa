@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,8 +42,10 @@ class EnsureTwoFactorAuthenticated
             return $next($request);
         }
 
+        $twoFactorRequired = $user->two_factor_required || Setting::getBool('two_factor_required_global');
+
         // If user requires 2FA but has not set it up yet → force setup
-        if ($user->two_factor_required && !$user->hasEnabledTwoFactor()) {
+        if ($twoFactorRequired && !$user->hasEnabledTwoFactor()) {
             return redirect()->route('two-factor.setup');
         }
 

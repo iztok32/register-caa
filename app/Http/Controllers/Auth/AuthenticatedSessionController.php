@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,8 +41,9 @@ class AuthenticatedSessionController extends Controller
         $user->last_login_at = now();
         $user->saveQuietly();
 
-        // If user requires 2FA but hasn't set it up → redirect to forced setup
-        if ($user->two_factor_required && !$user->hasEnabledTwoFactor()) {
+        // If 2FA is required (per-user or globally) but not set up → redirect to forced setup
+        $twoFactorRequired = $user->two_factor_required || Setting::getBool('two_factor_required_global');
+        if ($twoFactorRequired && !$user->hasEnabledTwoFactor()) {
             return redirect()->route('two-factor.setup');
         }
 

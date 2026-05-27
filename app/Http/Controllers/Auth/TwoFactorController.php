@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
@@ -25,11 +26,9 @@ class TwoFactorController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->two_factor_required) {
-            return redirect()->route('dashboard');
-        }
+        $required = $user->two_factor_required || Setting::getBool('two_factor_required_global');
 
-        if ($user->hasEnabledTwoFactor()) {
+        if (!$required || $user->hasEnabledTwoFactor()) {
             return redirect()->route('dashboard');
         }
 

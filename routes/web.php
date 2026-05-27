@@ -116,6 +116,8 @@ Route::middleware(['auth', 'two-factor'])->group(function () {
     // Settings routes
     Route::get('settings', [\App\Http\Controllers\Core\SettingsController::class, 'index'])->name('settings.index');
     Route::patch('settings/{key}', [\App\Http\Controllers\Core\SettingsController::class, 'update'])->name('settings.update');
+    Route::post('settings/signature-image', [\App\Http\Controllers\Core\SettingsController::class, 'storeSignatureImage'])->name('settings.signature-image.store');
+    Route::delete('settings/signature-image', [\App\Http\Controllers\Core\SettingsController::class, 'deleteSignatureImage'])->name('settings.signature-image.delete');
 
     // AircraftRegister Module
     Route::get('aircraft-register/aircraft', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'index'])->name('aircraft.index');
