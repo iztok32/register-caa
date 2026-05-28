@@ -1,5 +1,5 @@
 # ─── Production image ─────────────────────────────────────────────────────────
-# Frontend assets (public/build/) must be compiled locally before building:
+# public/build/ is excluded from git — compile locally before each docker build:
 #   npm run build
 #   docker build -t iztokvozlic/register-caa:latest .
 #   docker push iztokvozlic/register-caa:latest
