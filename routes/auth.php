@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\TwoFactorAuthenticatedSessionController;
 use App\Http\Controllers\Auth\TwoFactorController;
+use App\Http\Controllers\Auth\TwoFactorResetRequestController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,8 @@ Route::middleware('auth')->group(function () {
     Route::get('two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
         ->name('two-factor.challenge');
     Route::post('two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store']);
+    Route::post('two-factor/reset-request', [TwoFactorResetRequestController::class, 'store'])
+        ->name('two-factor.reset-request');
 
     // Two-Factor Setup (for users who optionally or mandatorily want to set up 2FA)
     Route::get('two-factor-setup', [TwoFactorController::class, 'setupRequired'])

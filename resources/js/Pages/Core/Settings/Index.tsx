@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Switch } from '@/Components/ui/switch';
 import { Badge } from '@/Components/ui/badge';
 import { Button } from '@/Components/ui/button';
-import { Globe, ShieldCheck, Bell, ChevronsUpDown, Check, X, FileSignature, UploadCloud, Trash2, RefreshCw, ImageIcon } from 'lucide-react';
+import { Input } from '@/Components/ui/input';
+import { Globe, ShieldCheck, Bell, Search, ChevronsUpDown, Check, X, FileSignature, UploadCloud, Trash2, RefreshCw, ImageIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/Components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/Components/ui/command';
 
@@ -36,6 +37,18 @@ export default function Index({ settings, notificationEmailOptions, signatureIma
         router.patch(route('settings.update', key), { value }, {
             preserveScroll: true,
         })
+    }
+
+    const handleInteger = (key: string, value: number) => {
+        router.patch(route('settings.update', key), { value }, {
+            preserveScroll: true,
+        })
+    }
+
+    const getInt = (key: string): number => {
+        const s = settings[key]
+        if (!s) return 0
+        return typeof s.value === 'number' ? s.value : parseInt(String(s.value), 10) || 0
     }
 
     const handleEmailsChange = (emails: string[]) => {
@@ -118,6 +131,50 @@ export default function Index({ settings, notificationEmailOptions, signatureIma
                             options={notificationEmailOptions}
                             selected={getEmails()}
                             onChange={handleEmailsChange}
+                        />
+                    </CardContent>
+                </Card>
+
+                {/* Search Settings */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Search className="h-5 w-5 text-muted-foreground" />
+                            <CardTitle>{t('Search Settings')}</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <IntegerSettingRow
+                            label={t('Rate limit per minute')}
+                            description={t('Rate limit per minute description')}
+                            value={getInt('search_rate_per_minute')}
+                            min={1} max={300}
+                            unit={t('searches')}
+                            onSave={(v) => handleInteger('search_rate_per_minute', v)}
+                        />
+                        <IntegerSettingRow
+                            label={t('Rate limit per hour')}
+                            description={t('Rate limit per hour description')}
+                            value={getInt('search_rate_per_hour')}
+                            min={1} max={10000}
+                            unit={t('searches')}
+                            onSave={(v) => handleInteger('search_rate_per_hour', v)}
+                        />
+                        <IntegerSettingRow
+                            label={t('Max results per search')}
+                            description={t('Max results description')}
+                            value={getInt('search_max_results')}
+                            min={1} max={100}
+                            unit={t('results')}
+                            onSave={(v) => handleInteger('search_max_results', v)}
+                        />
+                        <IntegerSettingRow
+                            label={t('Minimum search characters')}
+                            description={t('Min chars description')}
+                            value={getInt('search_min_chars')}
+                            min={1} max={10}
+                            unit={t('characters')}
+                            onSave={(v) => handleInteger('search_min_chars', v)}
                         />
                     </CardContent>
                 </Card>
@@ -270,6 +327,49 @@ function EmailMultiSelect({
                     </Command>
                 </PopoverContent>
             </Popover>
+        </div>
+    )
+}
+
+function IntegerSettingRow({
+    label, description, value, min, max, unit, onSave,
+}: {
+    label: string
+    description: string
+    value: number
+    min: number
+    max: number
+    unit: string
+    onSave: (value: number) => void
+}) {
+    const { t } = useTranslation()
+    const [current, setCurrent] = useState(value)
+    const dirty = current !== value
+
+    return (
+        <div className="flex items-center justify-between gap-4 py-2">
+            <div className="space-y-0.5 flex-1">
+                <p className="text-sm font-medium">{label}</p>
+                <p className="text-sm text-muted-foreground">{description}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+                <Input
+                    type="number"
+                    min={min}
+                    max={max}
+                    value={current}
+                    onChange={e => setCurrent(Math.max(min, Math.min(max, parseInt(e.target.value) || min)))}
+                    className="w-24 text-center"
+                />
+                <span className="text-sm text-muted-foreground whitespace-nowrap">{unit}</span>
+                <Button
+                    size="sm"
+                    disabled={!dirty}
+                    onClick={() => onSave(current)}
+                >
+                    {t('Save')}
+                </Button>
+            </div>
         </div>
     )
 }

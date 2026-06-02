@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Plus, Edit2, Trash2, Mail, Check, X, Search, LayoutGrid, LayoutList, FileDown } from 'lucide-react';
+import { Plus, Edit2, Trash2, Mail, Check, X, Search, LayoutGrid, LayoutList, FileDown, ShieldOff } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { PageProps } from '@/types';
 import {
@@ -39,6 +39,8 @@ interface User {
     name: string;
     email: string;
     is_active: boolean;
+    two_factor_enabled: boolean;
+    two_factor_reset_pending: boolean;
     roles: string[];
     last_login_at: string | null;
     created_at: string;
@@ -70,8 +72,11 @@ export default function Index({ users, roles }: Props) {
     const [editingUser, setEditingUser] = useState<User | undefined>(undefined);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<number | null>(null);
+    const [isReset2FADialogOpen, setIsReset2FADialogOpen] = useState(false);
+    const [userToReset2FA, setUserToReset2FA] = useState<User | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+    const [twoFaFilter, setTwoFaFilter] = useState<'all' | 'enabled' | 'pending'>('all');
 
     const handleCreate = () => {
         setEditingUser(undefined);
@@ -104,20 +109,44 @@ export default function Index({ users, roles }: Props) {
         }
     };
 
+    const handleReset2FA = (user: User) => {
+        setUserToReset2FA(user);
+        setIsReset2FADialogOpen(true);
+    };
+
+    const confirmReset2FA = () => {
+        if (userToReset2FA) {
+            router.delete(route('users.reset-two-factor', userToReset2FA.id), {
+                onSuccess: () => {
+                    setIsReset2FADialogOpen(false);
+                    setUserToReset2FA(null);
+                },
+            });
+        }
+    };
+
     const handleSendPasswordReset = (userId: number) => {
         router.post(route('users.send-password-reset'), {
             user_id: userId,
         });
     };
 
-    // Filter users based on search query
+    const count2faEnabled = users.filter(u => u.two_factor_enabled).length;
+    const count2faPending = users.filter(u => u.two_factor_reset_pending).length;
+
+    // Filter users based on search query and 2FA filter
     const filteredUsers = users.filter(user => {
         const query = searchQuery.toLowerCase();
-        return (
+        const matchesSearch = (
             user.name.toLowerCase().includes(query) ||
             user.email.toLowerCase().includes(query) ||
             user.roles.some(role => role.toLowerCase().includes(query))
         );
+        const matches2fa =
+            twoFaFilter === 'all' ||
+            (twoFaFilter === 'enabled' && user.two_factor_enabled) ||
+            (twoFaFilter === 'pending' && user.two_factor_reset_pending);
+        return matchesSearch && matches2fa;
     });
 
     const handleExport = () => {
@@ -154,7 +183,7 @@ export default function Index({ users, roles }: Props) {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                         <CardTitle>{t('Users')}</CardTitle>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap justify-end">
                             <div className="relative">
                                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input
@@ -164,6 +193,35 @@ export default function Index({ users, roles }: Props) {
                                     className="pl-8 w-64"
                                 />
                             </div>
+                            {/* 2FA filters */}
+                            <Button
+                                variant={twoFaFilter === 'enabled' ? 'secondary' : 'outline'}
+                                size="sm"
+                                className="gap-1.5 h-9"
+                                onClick={() => setTwoFaFilter(twoFaFilter === 'enabled' ? 'all' : 'enabled')}
+                                title={t('Filter: 2FA enabled')}
+                            >
+                                <ShieldOff className="h-4 w-4" />
+                                <span className="text-xs">{count2faEnabled}</span>
+                            </Button>
+                            <Button
+                                variant={twoFaFilter === 'pending' ? 'destructive' : 'outline'}
+                                size="sm"
+                                className={`gap-1.5 h-9 ${twoFaFilter !== 'pending' && count2faPending > 0 ? 'border-destructive/50 text-destructive hover:bg-destructive/10' : ''}`}
+                                onClick={() => setTwoFaFilter(twoFaFilter === 'pending' ? 'all' : 'pending')}
+                                title={t('Filter: 2FA reset pending')}
+                            >
+                                <ShieldOff className="h-4 w-4" />
+                                <span className={`text-xs font-semibold tabular-nums ${
+                                    twoFaFilter === 'pending'
+                                        ? 'text-white'
+                                        : count2faPending > 0
+                                            ? 'text-destructive'
+                                            : 'text-muted-foreground'
+                                }`}>
+                                    {count2faPending}
+                                </span>
+                            </Button>
                             <Button
                                 variant={viewMode === 'table' ? 'secondary' : 'outline'}
                                 size="sm"
@@ -218,7 +276,7 @@ export default function Index({ users, roles }: Props) {
                                                 <TableCell className="font-medium">{user.name}</TableCell>
                                                 <TableCell>{user.email}</TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-2 flex-wrap">
                                                         {user.deleted_at ? (
                                                             <Badge variant="destructive">{t('Deleted')}</Badge>
                                                         ) : user.is_active ? (
@@ -230,6 +288,12 @@ export default function Index({ users, roles }: Props) {
                                                             <Badge variant="secondary" className="gap-1">
                                                                 <X className="h-3 w-3" />
                                                                 {t('Inactive')}
+                                                            </Badge>
+                                                        )}
+                                                        {user.two_factor_reset_pending && (
+                                                            <Badge variant="destructive" className="gap-1 text-[10px]">
+                                                                <ShieldOff className="h-2.5 w-2.5" />
+                                                                {t('2FA Reset Pending')}
                                                             </Badge>
                                                         )}
                                                     </div>
@@ -255,6 +319,17 @@ export default function Index({ users, roles }: Props) {
                                                                 >
                                                                     <Mail className="h-4 w-4" />
                                                                 </Button>
+                                                                {user.two_factor_enabled && (
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => handleReset2FA(user)}
+                                                                        title={t('Reset 2FA')}
+                                                                        className={user.two_factor_reset_pending ? 'text-destructive hover:text-destructive' : ''}
+                                                                    >
+                                                                        <ShieldOff className="h-4 w-4" />
+                                                                    </Button>
+                                                                )}
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="icon"
@@ -398,6 +473,27 @@ export default function Index({ users, roles }: Props) {
                     />
                 </SheetContent>
             </Sheet>
+
+            {/* Reset 2FA dialog */}
+            <Dialog open={isReset2FADialogOpen} onOpenChange={setIsReset2FADialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t('Reset 2FA')}</DialogTitle>
+                        <DialogDescription>
+                            {t('This will clear the 2FA setup for :name. They will be required to set up 2FA again on next login.').replace(':name', userToReset2FA?.name ?? '')}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setIsReset2FADialogOpen(false)}>
+                            {t('Cancel')}
+                        </Button>
+                        <Button variant="destructive" onClick={confirmReset2FA}>
+                            <ShieldOff className="h-4 w-4 mr-2" />
+                            {t('Reset 2FA')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent>

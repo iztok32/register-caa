@@ -372,12 +372,9 @@ export default function Dashboard({ stats, search: initialSearch, searchResults,
                                         ? `${Math.round(stats.aircraft_registered / stats.aircraft_total * 100)}%`
                                         : undefined}
                                 />
-                                <StatTile icon={FileText} label={t('Active registrations')} value={stats.active_registrations} />
-
                                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide pt-2">
                                     {t('Owners & Operators')}
                                 </p>
-                                <StatTile icon={Users} label={t('Total')} value={stats.owners_total} />
                                 <StatTile icon={User} label={t('Persons')} value={stats.owners_persons} />
                                 <StatTile icon={Building2} label={t('Organisations')} value={stats.owners_organisations} />
                             </CardContent>

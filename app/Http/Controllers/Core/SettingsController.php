@@ -19,6 +19,7 @@ class SettingsController extends Controller
             'value' => match ($s->type) {
                 'boolean' => (bool) filter_var($s->value, FILTER_VALIDATE_BOOLEAN),
                 'json'    => json_decode($s->value ?? '[]', true) ?? [],
+                'integer' => (int) $s->value,
                 default   => $s->value,
             },
             'group' => $s->group,
@@ -83,6 +84,7 @@ class SettingsController extends Controller
         $value = match ($setting->type) {
             'boolean' => filter_var($validated['value'], FILTER_VALIDATE_BOOLEAN) ? '1' : '0',
             'json'    => json_encode($validated['value'] ?? []),
+            'integer' => (string) max(0, (int) $validated['value']),
             default   => (string) $validated['value'],
         };
 

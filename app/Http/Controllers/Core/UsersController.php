@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Core;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
+use App\Models\TwoFactorResetRequest;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -31,24 +33,30 @@ class UsersController extends Controller
         }
         $visibleRoles = $visibleRoles->unique('id');
 
+        // IDs of users with a pending 2FA reset request
+        $pendingResetUserIds = TwoFactorResetRequest::where('status', 'pending')
+            ->pluck('user_id')
+            ->flip();
+
         // Filter users based on role visibility
         $users = User::with('roles')
             ->visibleToUser($currentUser)
             ->orderBy('name')
             ->get()
-            ->map(function ($user) {
+            ->map(function ($user) use ($pendingResetUserIds) {
                 return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'gsm_number' => $user->gsm_number,
-                    'is_active' => $user->is_active,
-                    'two_factor_required' => $user->two_factor_required,
-                    'two_factor_enabled' => $user->hasEnabledTwoFactor(),
-                    'roles' => $user->roles->pluck('name'),
-                    'last_login_at' => $user->last_login_at,
-                    'created_at' => $user->created_at,
-                    'deleted_at' => $user->deleted_at,
+                    'id'                       => $user->id,
+                    'name'                     => $user->name,
+                    'email'                    => $user->email,
+                    'gsm_number'               => $user->gsm_number,
+                    'is_active'                => $user->is_active,
+                    'two_factor_required'      => $user->two_factor_required,
+                    'two_factor_enabled'       => $user->hasEnabledTwoFactor(),
+                    'two_factor_reset_pending' => isset($pendingResetUserIds[$user->id]),
+                    'roles'                    => $user->roles->pluck('name'),
+                    'last_login_at'            => $user->last_login_at,
+                    'created_at'               => $user->created_at,
+                    'deleted_at'               => $user->deleted_at,
                 ];
             });
 
@@ -224,5 +232,35 @@ class UsersController extends Controller
         }
 
         return $visibleRoleIds->unique();
+    }
+
+    public function resetTwoFactor(Request $request, User $user)
+    {
+        $user->two_factor_secret          = null;
+        $user->two_factor_recovery_codes  = null;
+        $user->two_factor_confirmed_at    = null;
+        $user->save();
+
+        // Mark any pending reset requests as approved
+        TwoFactorResetRequest::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->update([
+                'status'     => 'approved',
+                'handled_by' => $request->user()->id,
+                'handled_at' => now(),
+            ]);
+
+        // Notify the user via portal
+        Notification::create([
+            'sender_id'    => $request->user()->id,
+            'recipient_id' => $user->id,
+            'type'         => 'portal',
+            'subject'      => 'Ponastavitev dvostopenjske avtentikacije',
+            'message'      => 'Vaša dvostopenjska avtentikacija (2FA) je bila ponastavljena s strani upravljalca. Ob naslednji prijavi boste pozvani k ponovni nastavitvi.',
+            'status'       => 'sent',
+            'sent_at'      => now(),
+        ]);
+
+        return back()->with('success', __('2FA has been reset for :name.', ['name' => $user->name]));
     }
 }

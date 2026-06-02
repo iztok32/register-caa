@@ -60,6 +60,7 @@ Route::middleware(['auth', 'two-factor'])->group(function () {
         Route::put('users/{user}', [\App\Http\Controllers\Core\UsersController::class, 'update'])->name('users.update');
         Route::patch('users/{user}', [\App\Http\Controllers\Core\UsersController::class, 'update']);
         Route::post('users/send-password-reset', [\App\Http\Controllers\Core\UsersController::class, 'sendPasswordResetLink'])->name('users.send-password-reset');
+        Route::delete('users/{user}/two-factor', [\App\Http\Controllers\Core\UsersController::class, 'resetTwoFactor'])->name('users.reset-two-factor');
     });
     Route::middleware('permission:users.delete')->group(function () {
         Route::delete('users/{user}', [\App\Http\Controllers\Core\UsersController::class, 'destroy'])->name('users.destroy');
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'two-factor'])->group(function () {
     Route::patch('settings/{key}', [\App\Http\Controllers\Core\SettingsController::class, 'update'])->name('settings.update');
     Route::post('settings/signature-image', [\App\Http\Controllers\Core\SettingsController::class, 'storeSignatureImage'])->name('settings.signature-image.store');
     Route::delete('settings/signature-image', [\App\Http\Controllers\Core\SettingsController::class, 'deleteSignatureImage'])->name('settings.signature-image.delete');
+    Route::get('search-statistics', [\App\Http\Controllers\Core\SearchStatisticsController::class, 'index'])->name('search-statistics.index');
 
     // AircraftRegister Module
     Route::get('aircraft-register/aircraft', [\App\Http\Controllers\AircraftRegister\AircraftController::class, 'index'])->name('aircraft.index');

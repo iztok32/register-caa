@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AircraftOwner;
 use App\Models\AircraftSearchIndex;
 use App\Models\Owner;
 use Illuminate\Http\Request;
@@ -16,12 +15,10 @@ class DashboardController extends Controller
         $search = $request->input('search', '');
 
         $stats = [
-            'aircraft_total' => AircraftSearchIndex::count(),
-            'aircraft_registered' => AircraftSearchIndex::where('status', 'Registered')->count(),
-            'owners_total' => Owner::count(),
-            'owners_persons' => Owner::whereNotNull('person_last_name')->whereNull('organisation_name')->count(),
+            'aircraft_total'       => AircraftSearchIndex::count(),
+            'aircraft_registered'  => AircraftSearchIndex::where('status', 'Registered')->count(),
+            'owners_persons'       => Owner::whereNotNull('person_last_name')->whereNull('organisation_name')->count(),
             'owners_organisations' => Owner::whereNotNull('organisation_name')->count(),
-            'active_registrations' => AircraftOwner::where('is_closed', false)->count(),
         ];
 
         $searchResults = null;

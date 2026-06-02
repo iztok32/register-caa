@@ -35,6 +35,8 @@ interface Props extends PageProps {
     stats: Stats;
     search: string;
     searchResults: AircraftResult[] | null;
+    rateLimited: boolean;
+    minChars: number;
 }
 
 // ─── StatTile ─────────────────────────────────────────────────────────────────
@@ -100,7 +102,7 @@ function AircraftCard({ aircraft }: { aircraft: AircraftResult }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function PublicSearch({ auth, canLogin, canRegister, stats, search: initialSearch, searchResults }: Props) {
+export default function PublicSearch({ auth, canLogin, canRegister, stats, search: initialSearch, searchResults, rateLimited, minChars }: Props) {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState(initialSearch ?? '');
 
@@ -110,14 +112,14 @@ export default function PublicSearch({ auth, canLogin, canRegister, stats, searc
                 router.get(
                     route('home'),
                     { search: searchTerm || undefined },
-                    { preserveState: true, preserveScroll: true, replace: true, only: ['searchResults', 'search'] }
+                    { preserveState: true, preserveScroll: true, replace: true, only: ['searchResults', 'search', 'rateLimited'] }
                 );
             }
         }, 400);
         return () => clearTimeout(id);
     }, [searchTerm]);
 
-    const searched = searchTerm.trim().length >= 2;
+    const searched = searchTerm.trim().length >= minChars;
     const hasResults = searchResults !== null && searchResults.length > 0;
 
     return (
@@ -209,7 +211,7 @@ export default function PublicSearch({ auth, canLogin, canRegister, stats, searc
                                     </CardHeader>
                                     <CardContent>
                                         {/* Empty state */}
-                                        {!searched && (
+                                        {!searched && !rateLimited && (
                                             <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
                                                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                                                     <Plane className="h-7 w-7 text-muted-foreground" />
@@ -217,14 +219,29 @@ export default function PublicSearch({ auth, canLogin, canRegister, stats, searc
                                                 <div>
                                                     <p className="text-sm font-medium">{t('Search the public aircraft register')}</p>
                                                     <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                                                        {t('Enter at least 2 characters to search')}
+                                                        {t('Enter at least :n characters to search').replace(':n', String(minChars))}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Rate limited */}
+                                        {rateLimited && (
+                                            <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/20">
+                                                    <ShieldCheck className="h-7 w-7 text-orange-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium">{t('Too many searches')}</p>
+                                                    <p className="text-xs text-muted-foreground mt-1 max-w-xs">
+                                                        {t('You have exceeded the search limit. Please wait a moment before searching again.')}
                                                     </p>
                                                 </div>
                                             </div>
                                         )}
 
                                         {/* No results */}
-                                        {searched && !hasResults && (
+                                        {searched && !rateLimited && !hasResults && (
                                             <div className="flex flex-col items-center justify-center py-16 gap-2 text-center">
                                                 <p className="text-sm text-muted-foreground">
                                                     {t('No aircraft found for')} &ldquo;<strong>{searchTerm}</strong>&rdquo;
@@ -233,18 +250,16 @@ export default function PublicSearch({ auth, canLogin, canRegister, stats, searc
                                         )}
 
                                         {/* Results grid */}
-                                        {hasResults && (
+                                        {hasResults && !rateLimited && (
                                             <div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     {(searchResults as AircraftResult[]).map(a => (
                                                         <AircraftCard key={a.empic_id} aircraft={a} />
                                                     ))}
                                                 </div>
-                                                {searchResults!.length === 15 && (
-                                                    <p className="text-xs text-muted-foreground text-center mt-4">
-                                                        {t('Showing first 15 results.')}
-                                                    </p>
-                                                )}
+                                                <p className="text-xs text-muted-foreground text-center mt-4">
+                                                    {t('Showing :n results.').replace(':n', String(searchResults!.length))}
+                                                </p>
                                             </div>
                                         )}
                                     </CardContent>
